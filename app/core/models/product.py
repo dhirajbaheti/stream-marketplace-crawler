@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Union
 from pydantic import Field, BaseModel
 
 
@@ -14,4 +14,5 @@ class ProductDetails(BaseModel):
     marketable: bool = Field()
 
 class ProductResponse(BaseModel):
-    product_list: List[ProductDetails]
+    product_list: Optional[List[ProductDetails]] = None
+    error: Optional[Union[str, None]] = None
