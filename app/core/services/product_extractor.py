@@ -12,8 +12,8 @@ def get_proxy():
     This is a helper function to get the proxy for each request.
     Currently it uses dummy values which needs to be replaced with the actual for production environment.
     """
-    proxy_host = "XXXXXXX.com"
-    proxy_port = "9888"
+    proxy_host = "xxxxxx.com"
+    proxy_port = "19888"
     proxies = {"https": "http://{}:{}/".format(proxy_host, proxy_port),
                "http": "http://{}:{}/".format(proxy_host, proxy_port)}
 
@@ -38,12 +38,14 @@ def parse_products(response):
 
     return products
 
-def crawl_products(page_limit: int) -> []:
+def crawl_products(page_limit: int):
     """
     This function is used to crawl the products from streamcommunity.com and return list of products.
     Input: page_limit(int)
-    Output: product_list
+    Output: status, product_list
     """
+    status = None
+    response = None
     product_list = []
     pagesize = 10
     raw_url = "https://steamcommunity.com/market/search/render/?norender=1&query=&start={start}&count=10&search_descriptions=0&sort_column=popular&sort_dir=desc"
@@ -68,12 +70,20 @@ def crawl_products(page_limit: int) -> []:
                     'sec-ch-ua-platform': '"macOS"'
                 }
                 response = requests.get(url, headers=headers, proxies=get_proxy())
+                status = response.status_code
                 response.raise_for_status()
                 product_list.extend(parse_products(response))
                 break
             except Exception as e:
-                logger.error(f"Exception occurred while crawling products. {e}. Retrying")
+                if response.status_code in (403, 429):
+                    logger.error(f"Crawler is being blocked. {e}.")
+                    break
+                logger.warning(f"Exception occurred while crawling products. {e}. Retrying")
 
-    logger.info(f"Extracted {len(product_list)} products from {page_limit} pages.")
+        if response.status_code in (403, 429):
+            break
 
-    return product_list
+    if status == 200:
+        logger.info(f"Extracted {len(product_list)} products from {page_limit} pages.")
+
+    return status, product_list
