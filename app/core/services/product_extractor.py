@@ -12,8 +12,8 @@ def get_proxy():
     This is a helper function to get the proxy for each request.
     Currently it uses dummy values which needs to be replaced with the actual for production environment.
     """
-    proxy_host = "vmw.trustyou.com"
-    proxy_port = "19888"
+    proxy_host = "XXXXXXX.com"
+    proxy_port = "9888"
     proxies = {"https": "http://{}:{}/".format(proxy_host, proxy_port),
                "http": "http://{}:{}/".format(proxy_host, proxy_port)}
 
