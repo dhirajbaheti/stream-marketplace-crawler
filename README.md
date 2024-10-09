@@ -1,4 +1,4 @@
-# Stream Community Products
+# Stream Community Product Crawler
 
 Crawl product listings from the streamcommunity.com website.
 
